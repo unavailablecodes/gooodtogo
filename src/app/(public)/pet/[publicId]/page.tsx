@@ -105,7 +105,7 @@ export default function PublicPetPage() {
     );
   }
 
-  const primaryPhoto = pet.pet_photos?.find(p => p.is_primary) || pet.pet_photos?.[0];
+  const primaryPhoto = pet.pet_photos?.find((p: any) => p.is_primary) || pet.pet_photos?.[0];
   const scoreData = calculatePetOverallScore(reviewsToScoringFormat(reviews));
 
   const speciesLabel = SPECIES_OPTIONS.find(s => s.value === pet.species)?.label || pet.species;

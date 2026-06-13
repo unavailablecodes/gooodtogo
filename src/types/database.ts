@@ -124,6 +124,8 @@ export interface Business {
   default_access_policy: AccessDecision;
   is_verified: boolean;
   is_active: boolean;
+  pet_friendly_score: number;
+  total_business_reviews: number;
   created_at: string;
   updated_at: string;
   owner?: Profile;
@@ -196,6 +198,56 @@ export interface PetVisit {
   created_at: string;
   pet?: Pet;
   business?: Business;
+}
+
+export interface BusinessVisit {
+  id: string;
+  pet_id: string;
+  business_id: string;
+  visit_date: string;
+  check_in_time: string | null;
+  check_out_time: string | null;
+  business_rated: boolean;
+  pet_rated: boolean;
+  created_at: string;
+  pet?: Pet;
+  business?: Business;
+}
+
+export interface BusinessReview {
+  id: string;
+  visit_id: string;
+  business_id: string;
+  reviewer_id: string;
+  welcome_rating: number | null;
+  facilities_rating: number | null;
+  cleanliness_rating: number | null;
+  pet_safety_rating: number | null;
+  staff_friendliness: number | null;
+  overall_rating: number | null;
+  would_recommend: boolean | null;
+  would_visit_again: boolean | null;
+  review_text: string | null;
+  created_at: string;
+  business?: Business;
+  reviewer?: Profile;
+}
+
+export interface BusinessCheckin {
+  id: string;
+  pet_id: string;
+  business_id: string | null;
+  business_name: string | null;
+  visit_date: string;
+  overall_rating: number | null;
+  was_aggressive: boolean;
+  was_noisy: boolean;
+  was_friendly: boolean;
+  cleaned_up_after: boolean;
+  would_allow_again: boolean;
+  notes: string | null;
+  verified: boolean;
+  created_at: string;
 }
 
 export interface UserCredibility {

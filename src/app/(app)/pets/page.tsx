@@ -128,7 +128,7 @@ export default function PetsPage() {
         ) : (
           <div className="space-y-4">
             {filteredPets.map((pet) => {
-              const primaryPhoto = pet.pet_photos?.find(p => p.is_primary) || pet.pet_photos?.[0];
+              const primaryPhoto = pet.pet_photos?.find((p: any) => p.is_primary) || pet.pet_photos?.[0];
               const isDeleteRequested = pet.delete_requested;
 
               return (

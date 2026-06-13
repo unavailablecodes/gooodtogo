@@ -14,6 +14,15 @@ export function Header() {
 
   const isActive = (path: string) => pathname === path;
 
+  const navItems = [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/pets', label: 'My Pets' },
+    { href: '/reviews', label: 'Reviews' },
+    { href: '/scan', label: 'Scan' },
+    { href: '/settings', label: 'Settings' },
+    ...(profile?.role === 'business' || profile?.role === 'admin' ? [{ href: '/business', label: 'Business' }] : []),
+  ];
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/5">
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
@@ -26,13 +35,7 @@ export function Header() {
         {/* Desktop Navigation */}
         {user ? (
           <nav className="hidden md:flex items-center gap-1">
-            {[
-              { href: '/dashboard', label: 'Dashboard' },
-              { href: '/pets', label: 'My Pets' },
-              { href: '/reviews', label: 'Reviews' },
-              { href: '/scan', label: 'Scan' },
-              { href: '/settings', label: 'Settings' },
-            ].map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

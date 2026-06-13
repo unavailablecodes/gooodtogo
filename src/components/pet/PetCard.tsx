@@ -14,7 +14,7 @@ interface PetCardProps {
 }
 
 export function PetCard({ pet, showOwner = false }: PetCardProps) {
-  const primaryPhoto = pet.pet_photos?.find(p => p.is_primary) || pet.pet_photos?.[0];
+  const primaryPhoto = pet.pet_photos?.find((p: any) => p.is_primary) || pet.pet_photos?.[0];
 
   return (
     <Link href={`/pets/${pet.id}`}>

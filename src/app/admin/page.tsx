@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                     <span className="text-[14px] text-[#86868b]">No pending requests</span>
                   </div>
                 ) : deleteRequests.map((req) => {
-                  const photo = req.pet_photos.find(p => p.url);
+                  const photo = req.pet_photos.find((p: any) => p.url);
                   return (
                     <div key={req.id} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-black/5">
                       <div className="w-10 h-10 rounded-lg bg-[#f5f5f5] flex items-center justify-center overflow-hidden">
