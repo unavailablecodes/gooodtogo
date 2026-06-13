@@ -1,0 +1,270 @@
+@import "tailwindcss";
+
+:root {
+  --apple-gray-50: #f5f5f7;
+  --apple-gray-100: #e8e8ed;
+  --apple-gray-200: #d2d2d7;
+  --apple-gray-300: #86868b;
+  --apple-gray-400: #6e6e73;
+  --apple-gray-500: #424245;
+  --apple-gray-600: #333336;
+  --apple-gray-700: #1d1d1f;
+  --apple-blue: #0071e3;
+  --apple-blue-hover: #0077ed;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background-color: var(--apple-gray-50);
+  color: var(--apple-gray-700);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Minimalist Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 980px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  letter-spacing: -0.01em;
+}
+
+.btn-primary {
+  background-color: var(--apple-gray-700);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #000;
+  transform: scale(1.02);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--apple-gray-700);
+  border: 1.5px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.btn-secondary:hover {
+  border-color: rgba(0,0,0,0.15);
+  transform: scale(1.02);
+}
+
+.btn-blue {
+  background-color: var(--apple-blue);
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: var(--apple-blue-hover);
+  transform: scale(1.02);
+}
+
+/* Minimalist Card */
+.card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+  overflow: hidden;
+}
+
+/* Minimalist Input */
+.input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 1.5px solid var(--apple-gray-200);
+  border-radius: 12px;
+  background: white;
+  transition: all 0.2s ease;
+  outline: none;
+  letter-spacing: -0.01em;
+}
+
+.input:focus {
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.08);
+}
+
+.input::placeholder {
+  color: var(--apple-gray-300);
+}
+
+/* Minimalist Select */
+.select {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 1.5px solid var(--apple-gray-200);
+  border-radius: 12px;
+  background: white;
+  transition: all 0.2s ease;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 48px;
+}
+
+.select:focus {
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.08);
+}
+
+/* Minimalist Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 100px;
+  background: var(--apple-gray-100);
+  color: var(--apple-gray-600);
+  letter-spacing: -0.01em;
+}
+
+/* Score Circle */
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--apple-gray-50) 0%, white 100%);
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease forwards;
+}
+
+/* Paw Loading Animation */
+@keyframes pawBounce {
+  0%, 80%, 100% { transform: scale(1); }
+  40% { transform: scale(1.15) rotate(-5deg); }
+}
+
+.animate-paw {
+  animation: pawBounce 1.4s ease-in-out infinite;
+}
+
+.animate-paw-delay-1 {
+  animation: pawBounce 1.4s ease-in-out infinite 0.2s;
+}
+
+.animate-paw-delay-2 {
+  animation: pawBounce 1.4s ease-in-out infinite 0.4s;
+}
+
+/* Paw Pulse */
+@keyframes pawPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.animate-paw-pulse {
+  animation: pawPulse 2s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--apple-gray-200);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--apple-gray-300);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 113, 227, 0.15);
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid var(--apple-blue);
+  outline-offset: 2px;
+}
+
+/* Transitions */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Subtle shadows */
+.shadow-subtle {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+/* Smooth image loading */
+img {
+  transition: opacity 0.3s ease;
+}
+
+/* Minimal divider */
+.divider {
+  height: 1px;
+  background: rgba(0,0,0,0.06);
+}
