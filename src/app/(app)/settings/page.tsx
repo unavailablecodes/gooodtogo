@@ -8,12 +8,33 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { User, Shield, Bell, Trash2, LogOut } from 'lucide-react';
+import { User, Shield, Bell, Trash2, LogOut, Check } from 'lucide-react';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { profile, updateProfile, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [fullName, setFullName] = useState(profile?.full_name || '');
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSave = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    const { error: updateError } = await updateProfile({ full_name: fullName });
+
+    if (updateError) {
+      setError(updateError.message);
+    } else {
+      setSuccess(true);
+      setEditMode(false);
+      setTimeout(() => setSuccess(false), 3000);
+    }
+    setLoading(false);
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -31,24 +52,64 @@ export default function SettingsPage() {
         {/* Profile */}
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <User className="w-5 h-5 text-gray-500" />
-              <CardTitle>Profile</CardTitle>
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-gray-500" />
+                <CardTitle>Profile</CardTitle>
+              </div>
+              {!editMode && (
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="text-[13px] text-[#0071e3] hover:underline"
+                >
+                  Edit
+                </button>
+              )}
             </div>
             <CardDescription>Your account information</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4 mb-4">
-              <Avatar src={profile?.avatar_url} name={profile?.full_name} size="xl" />
+              <Avatar src={profile?.avatar_url} name={fullName || 'User'} size="xl" />
               <div>
-                <p className="font-semibold text-gray-900">{profile?.full_name || 'User'}</p>
+                <p className="font-semibold text-gray-900">{fullName || 'User'}</p>
                 <p className="text-sm text-gray-500">{profile?.email}</p>
                 <p className="text-sm text-gray-500 capitalize">Role: {profile?.role || 'user'}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-500">
-              To update your profile information, please contact support or use the Supabase dashboard.
-            </p>
+
+            {editMode && (
+              <div className="space-y-4 pt-4 border-t border-gray-100">
+                {error && (
+                  <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="p-3 bg-green-50 text-green-600 text-sm rounded-lg flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    Profile updated successfully!
+                  </div>
+                )}
+                <Input
+                  label="Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Enter your name"
+                />
+                <div className="flex gap-3">
+                  <Button onClick={handleSave} isLoading={loading}>
+                    Save Changes
+                  </Button>
+                  <Button variant="outline" onClick={() => {
+                    setEditMode(false);
+                    setFullName(profile?.full_name || '');
+                  }}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
