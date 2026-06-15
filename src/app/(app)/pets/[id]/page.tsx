@@ -61,9 +61,26 @@ export default function PetDetailPage() {
     if (petId) fetchData();
   }, [petId]);
 
+  const MAX_PHOTOS = 3;
+
   const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!pet || !e.target.files?.[0]) return;
+
+    // Check photo limit
+    const currentPhotos = pet.pet_photos?.length || 0;
+    if (currentPhotos >= MAX_PHOTOS) {
+      alert(`Maximum ${MAX_PHOTOS} photos allowed per pet`);
+      return;
+    }
+
     const file = e.target.files[0];
+
+    // Compress image before upload (limit to 1MB)
+    if (file.size > 1024 * 1024) {
+      alert('Please select an image under 1MB for better performance');
+      return;
+    }
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${pet.id}/${Date.now()}.${fileExt}`;
 
@@ -71,11 +88,11 @@ export default function PetDetailPage() {
     const { data: { publicUrl } } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
     await supabase.from('pet_photos').insert({
       pet_id: pet.id, storage_path: fileName, url: publicUrl,
-      is_primary: (pet.pet_photos?.length || 0) === 0,
-      order_index: pet.pet_photos?.length || 0,
+      is_primary: currentPhotos === 0,
+      order_index: currentPhotos,
     });
 
-    setPet(prev => prev ? { ...prev, pet_photos: [...(prev.pet_photos || []), { id: Date.now().toString(), pet_id: pet.id, storage_path: fileName, url: publicUrl, is_primary: false, order_index: pet.pet_photos?.length || 0, created_at: new Date().toISOString() } as PetPhoto] } : null);
+    setPet(prev => prev ? { ...prev, pet_photos: [...(prev.pet_photos || []), { id: Date.now().toString(), pet_id: pet.id, storage_path: fileName, url: publicUrl, is_primary: currentPhotos === 0, order_index: currentPhotos, created_at: new Date().toISOString() } as PetPhoto] } : null);
   };
 
   const handleDeletePet = async () => {
@@ -179,17 +196,25 @@ export default function PetDetailPage() {
             </div>
 
             {pet.pet_photos && pet.pet_photos.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {pet.pet_photos.map((photo, i) => (
-                  <button key={photo.id} onClick={() => setActivePhoto(i)} className={`w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 ${activePhoto === i ? 'ring-2 ring-[#1d1d1f]' : ''}`}>
-                    <img src={photo.url} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-                {isOwner && (
-                  <label className="w-16 h-16 rounded-xl border-2 border-dashed border-black/10 flex items-center justify-center flex-shrink-0 cursor-pointer hover:border-[#1d1d1f]">
-                    <span className="text-[#86868b]">+</span>
-                    <input type="file" accept="image/*" onChange={handleUploadPhoto} className="hidden" />
-                  </label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-[12px] text-[#86868b]">Photos ({pet.pet_photos.length}/{MAX_PHOTOS})</p>
+                  {isOwner && pet.pet_photos.length < MAX_PHOTOS && (
+                    <label className="text-[12px] text-[#0071e3] cursor-pointer hover:underline">
+                      Add photo
+                      <input type="file" accept="image/*" onChange={handleUploadPhoto} className="hidden" />
+                    </label>
+                  )}
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {pet.pet_photos.map((photo, i) => (
+                    <button key={photo.id} onClick={() => setActivePhoto(i)} className={`w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 ${activePhoto === i ? 'ring-2 ring-[#1d1d1f]' : ''}`}>
+                      <img src={photo.url} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+                {isOwner && pet.pet_photos.length >= MAX_PHOTOS && (
+                  <p className="text-[11px] text-[#86868b]">Maximum {MAX_PHOTOS} photos reached</p>
                 )}
               </div>
             )}
