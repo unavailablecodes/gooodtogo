@@ -33,6 +33,11 @@ export function formatRelativeTime(date: string | Date): string {
   return formatDate(d);
 }
 
+// Alias for formatRelativeTime (used in NeighborVerificationList)
+export function formatDistanceToNow(date: string | Date): string {
+  return formatRelativeTime(date);
+}
+
 // Age formatting
 export function formatAge(months: number | null | undefined): string {
   if (months === null || months === undefined) return 'Unknown';

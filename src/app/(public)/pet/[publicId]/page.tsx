@@ -10,11 +10,13 @@ import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { ScoreDisplay, ScoreBreakdown } from '@/components/ui/ScoreDisplay';
 import { ReviewCard } from '@/components/review/ReviewCard';
+import { NeighborVerificationForm } from '@/components/verify/NeighborVerificationForm';
+import { NeighborVerificationList } from '@/components/verify/NeighborVerificationList';
 import { calculatePetOverallScore, reviewsToScoringFormat } from '@/lib/utils/scoring';
 import { formatAge, getSpeciesEmoji, getVaccinationColor } from '@/lib/utils/format';
 import { SPECIES_OPTIONS, SIZE_OPTIONS, GENDER_OPTIONS, VACCINATION_OPTIONS } from '@/lib/constants/categories';
-import { ArrowLeft, MapPin, Calendar, Check, Mail, Phone, ExternalLink } from 'lucide-react';
-import type { Pet, Review } from '@/types/database';
+import { ArrowLeft, MapPin, Calendar, Check, Mail, Phone, ExternalLink, Users } from 'lucide-react';
+import type { Pet, Review, NeighborVerification } from '@/types/database';
 
 export default function PublicPetPage() {
   const params = useParams();
@@ -23,6 +25,7 @@ export default function PublicPetPage() {
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [verifications, setVerifications] = useState<NeighborVerification[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -70,6 +73,15 @@ export default function PublicPetPage() {
         .order('created_at', { ascending: false });
 
       setReviews(reviewsData || []);
+
+      // Fetch neighbor verifications
+      const { data: verificationsData } = await supabase
+        .from('neighbor_verifications')
+        .select('*')
+        .eq('pet_id', petData.id)
+        .order('created_at', { ascending: false });
+
+      setVerifications(verificationsData || []);
       setLoading(false);
     };
 
@@ -218,6 +230,18 @@ export default function PublicPetPage() {
               <p className="text-sm text-gray-500">Be the first to review this pet!</p>
             </Card>
           )}
+
+          {/* Neighbor Verification */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Neighbor Verifications
+            </h3>
+            <NeighborVerificationForm petId={pet.id} petName={pet.name} />
+            {verifications.length > 0 && (
+              <NeighborVerificationList verifications={verifications} showDate={true} />
+            )}
+          </div>
 
           {/* Bio */}
           {pet.bio && (
