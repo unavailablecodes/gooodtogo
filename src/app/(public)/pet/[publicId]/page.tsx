@@ -17,6 +17,7 @@ import { formatAge, getSpeciesEmoji, getVaccinationColor } from '@/lib/utils/for
 import { SPECIES_OPTIONS, SIZE_OPTIONS, GENDER_OPTIONS, VACCINATION_OPTIONS } from '@/lib/constants/categories';
 import { ArrowLeft, MapPin, Calendar, Check, Mail, Phone, ExternalLink, Users } from 'lucide-react';
 import type { Pet, Review, NeighborVerification } from '@/types/database';
+import type { User } from '@supabase/supabase-js';
 
 export default function PublicPetPage() {
   const params = useParams();
@@ -26,6 +27,7 @@ export default function PublicPetPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [verifications, setVerifications] = useState<NeighborVerification[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -33,6 +35,10 @@ export default function PublicPetPage() {
     const fetchData = async () => {
       setLoading(true);
       setNotFound(false);
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
 
       // Fetch pet by public ID
       const { data: petData } = await supabase
@@ -89,6 +95,9 @@ export default function PublicPetPage() {
       fetchData();
     }
   }, [publicId]);
+
+  // Check if current user is the pet owner
+  const isOwner = currentUser && pet && currentUser.id === pet.owner_id;
 
   if (loading) {
     return (
@@ -235,11 +244,11 @@ export default function PublicPetPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Neighbor Verifications
+              {isOwner ? 'Neighbor Feedback' : 'Neighbor Verifications'}
             </h3>
             <NeighborVerificationForm petId={pet.id} petName={pet.name} />
             {verifications.length > 0 && (
-              <NeighborVerificationList verifications={verifications} showDate={true} />
+              <NeighborVerificationList verifications={verifications} showDate={true} isOwner={isOwner} />
             )}
           </div>
 
