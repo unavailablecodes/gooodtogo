@@ -95,6 +95,24 @@ export default function PetDetailPage() {
     setPet(prev => prev ? { ...prev, pet_photos: [...(prev.pet_photos || []), { id: Date.now().toString(), pet_id: pet.id, storage_path: fileName, url: publicUrl, is_primary: currentPhotos === 0, order_index: currentPhotos, created_at: new Date().toISOString() } as PetPhoto] } : null);
   };
 
+  const handleDeletePhoto = async (photoId: string) => {
+    if (!pet) return;
+    if (!confirm('Delete this photo?')) return;
+
+    const photo = pet.pet_photos?.find(p => p.id === photoId);
+    if (!photo) return;
+
+    // Delete from storage
+    await supabase.storage.from('pet-photos').remove([photo.storage_path]);
+
+    // Delete from database
+    await supabase.from('pet_photos').delete().eq('id', photoId);
+
+    // Update local state
+    const updatedPhotos = pet.pet_photos?.filter(p => p.id !== photoId) || [];
+    setPet(prev => prev ? { ...prev, pet_photos: updatedPhotos } : null);
+  };
+
   const handleDeletePet = async () => {
     if (!pet || !confirm('Request to delete this profile?')) return;
     await supabase.from('pets').update({ delete_requested: true, delete_requested_at: new Date().toISOString() }).eq('id', pet.id);
@@ -195,26 +213,44 @@ export default function PetDetailPage() {
               )}
             </div>
 
-            {pet.pet_photos && pet.pet_photos.length > 1 && (
+            {/* Photo management section - always show for owner */}
+            {isOwner && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[12px] text-[#86868b]">Photos ({pet.pet_photos.length}/{MAX_PHOTOS})</p>
-                  {isOwner && pet.pet_photos.length < MAX_PHOTOS && (
-                    <label className="text-[12px] text-[#0071e3] cursor-pointer hover:underline">
-                      Add photo
+                  <p className="text-[12px] text-[#86868b]">
+                    Photos ({pet.pet_photos?.length || 0}/{MAX_PHOTOS})
+                  </p>
+                  {(pet.pet_photos?.length || 0) < MAX_PHOTOS ? (
+                    <label className="text-[12px] text-[#0071e3] cursor-pointer hover:underline flex items-center gap-1">
+                      + Add photo
                       <input type="file" accept="image/*" onChange={handleUploadPhoto} className="hidden" />
                     </label>
+                  ) : (
+                    <span className="text-[11px] text-[#86868b]">Maximum reached</span>
                   )}
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {pet.pet_photos.map((photo, i) => (
-                    <button key={photo.id} onClick={() => setActivePhoto(i)} className={`w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 ${activePhoto === i ? 'ring-2 ring-[#1d1d1f]' : ''}`}>
-                      <img src={photo.url} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-                {isOwner && pet.pet_photos.length >= MAX_PHOTOS && (
-                  <p className="text-[11px] text-[#86868b]">Maximum {MAX_PHOTOS} photos reached</p>
+
+                {/* Thumbnail gallery */}
+                {(pet.pet_photos?.length || 0) > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {pet.pet_photos?.map((photo, i) => (
+                      <div key={photo.id} className="relative group">
+                        <button
+                          onClick={() => setActivePhoto(i)}
+                          className={`w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 ${activePhoto === i ? 'ring-2 ring-[#1d1d1f]' : 'opacity-70'}`}
+                        >
+                          <img src={photo.url} alt="" className="w-full h-full object-cover" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePhoto(photo.id)}
+                          className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Delete photo"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
