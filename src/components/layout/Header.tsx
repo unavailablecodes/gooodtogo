@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useState, useRef, useEffect } from 'react';
 import { Settings, LogOut, User, ChevronDown } from 'lucide-react';
 
@@ -74,6 +75,9 @@ export function Header() {
         <div className="flex items-center gap-2">
           {user ? (
             <div className="relative" ref={menuRef}>
+              {/* Notification Bell */}
+              <NotificationBell />
+
               {/* User Name + Avatar Button */}
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
