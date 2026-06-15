@@ -75,9 +75,6 @@ export function Header() {
         <div className="flex items-center gap-2">
           {user ? (
             <div className="relative" ref={menuRef}>
-              {/* Notification Bell */}
-              <NotificationBell />
-
               {/* User Name + Avatar Button */}
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -92,11 +89,17 @@ export function Header() {
 
               {/* Dropdown Menu */}
               {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl border border-black/5 shadow-lg py-2 animate-fade-in">
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl border border-black/5 shadow-lg py-2 animate-fade-in">
                   <div className="px-4 py-2 border-b border-black/5">
                     <p className="text-[13px] font-medium text-[#1d1d1f]">{profile?.full_name || 'User'}</p>
                     <p className="text-[12px] text-[#86868b]">{profile?.email}</p>
                   </div>
+
+                  {/* Notifications inside dropdown */}
+                  <div className="border-b border-black/5">
+                    <NotificationBell />
+                  </div>
+
                   <Link
                     href="/settings"
                     onClick={() => setUserMenuOpen(false)}

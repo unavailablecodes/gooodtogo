@@ -1,24 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import { Bell, Check, Users, Store, Star, Eye } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from '@/lib/utils/format';
 
 export function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -36,72 +23,63 @@ export function NotificationBell() {
   };
 
   return (
-    <div className="relative" ref={menuRef}>
-      {/* Bell Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-black/5 transition-colors"
-      >
-        <Bell className="w-5 h-5 text-gray-600" />
+    <div className="px-4 py-3">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Bell className="w-4 h-4 text-[#86868b]" />
+          <span className="text-[13px] font-medium text-[#1d1d1f]">Notifications</span>
+          {unreadCount > 0 && (
+            <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">
+              {unreadCount}
+            </span>
+          )}
+        </div>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
+          <button
+            onClick={markAllAsRead}
+            className="text-[11px] text-[#0071e3] hover:underline"
+          >
+            Mark all read
+          </button>
         )}
-      </button>
+      </div>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl border border-black/5 shadow-lg overflow-hidden z-50">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-black/5">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-              >
-                <Check className="w-3 h-3" />
-                Mark all read
-              </button>
-            )}
-          </div>
-
-          {/* Notifications List */}
-          <div className="max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="py-8 text-center">
-                <Bell className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No notifications yet</p>
-              </div>
-            ) : (
-              notifications.slice(0, 10).map((notification) => (
-                <div
-                  key={notification.id}
-                  onClick={() => !notification.is_read && markAsRead(notification.id)}
-                  className={`px-4 py-3 border-b border-black/5 last:border-0 hover:bg-gray-50 cursor-pointer ${
-                    !notification.is_read ? 'bg-blue-50/50' : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      {getIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{notification.message}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {formatDistanceToNow(notification.created_at)}
-                      </p>
-                    </div>
-                    {!notification.is_read && (
-                      <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />
-                    )}
-                  </div>
+      {notifications.length === 0 ? (
+        <div className="text-center py-4">
+          <Bell className="w-6 h-6 text-gray-300 mx-auto mb-1" />
+          <p className="text-xs text-[#86868b]">No notifications yet</p>
+        </div>
+      ) : (
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+          {notifications.slice(0, 5).map((notification) => (
+            <div
+              key={notification.id}
+              onClick={() => !notification.is_read && markAsRead(notification.id)}
+              className={`p-2 rounded-lg transition-colors ${
+                !notification.is_read ? 'bg-blue-50' : 'hover:bg-gray-50'
+              } cursor-pointer`}
+            >
+              <div className="flex items-start gap-2">
+                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  {getIcon(notification.type)}
                 </div>
-              ))
-            )}
-          </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-medium text-[#1d1d1f] line-clamp-1">
+                    {notification.title}
+                  </p>
+                  <p className="text-[11px] text-[#86868b] line-clamp-1">
+                    {notification.message}
+                  </p>
+                  <p className="text-[10px] text-[#a1a1a6] mt-0.5">
+                    {formatDistanceToNow(notification.created_at)}
+                  </p>
+                </div>
+                {!notification.is_read && (
+                  <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1" />
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
