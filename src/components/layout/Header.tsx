@@ -1,27 +1,44 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { Settings, LogOut, User, ChevronDown } from 'lucide-react';
 
 export function Header() {
   const { user, profile, signOut } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const isActive = (path: string) => pathname === path;
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/pets', label: 'My Pets' },
-    { href: '/reviews', label: 'Reviews' },
-    { href: '/scan', label: 'Scan' },
-    { href: '/settings', label: 'Settings' },
     ...(profile?.role === 'business' || profile?.role === 'admin' ? [{ href: '/business', label: 'Business' }] : []),
   ];
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/5">
@@ -56,18 +73,44 @@ export function Header() {
         {/* User Actions */}
         <div className="flex items-center gap-2">
           {user ? (
-            <>
-              <div className="hidden sm:flex items-center gap-3">
-                <Avatar src={profile?.avatar_url} name={profile?.full_name} size="sm" />
-                <span className="text-[13px] text-[#1d1d1f] font-medium">{profile?.full_name || 'User'}</span>
-              </div>
+            <div className="relative" ref={menuRef}>
+              {/* User Name + Avatar Button */}
               <button
-                onClick={() => signOut()}
-                className="text-[13px] text-[#86868b] hover:text-[#1d1d1f] px-3 py-1.5 rounded-full hover:bg-black/5 transition-all"
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 transition-all"
               >
-                Sign Out
+                <span className="text-[13px] text-[#1d1d1f] font-medium">
+                  {profile?.full_name || 'User'}
+                </span>
+                <Avatar src={profile?.avatar_url} name={profile?.full_name} size="sm" />
+                <ChevronDown className={`w-4 h-4 text-[#86868b] transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
               </button>
-            </>
+
+              {/* Dropdown Menu */}
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl border border-black/5 shadow-lg py-2 animate-fade-in">
+                  <div className="px-4 py-2 border-b border-black/5">
+                    <p className="text-[13px] font-medium text-[#1d1d1f]">{profile?.full_name || 'User'}</p>
+                    <p className="text-[12px] text-[#86868b]">{profile?.email}</p>
+                  </div>
+                  <Link
+                    href="/settings"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-[#1d1d1f] hover:bg-black/5 transition-all"
+                  >
+                    <Settings className="w-4 h-4 text-[#86868b]" />
+                    Settings
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-3 w-full px-4 py-2.5 text-[13px] text-[#ff3b30] hover:bg-red-50 transition-all"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <Link href="/login">
@@ -102,8 +145,6 @@ export function Header() {
             {[
               { href: '/dashboard', label: 'Dashboard' },
               { href: '/pets', label: 'My Pets' },
-              { href: '/reviews', label: 'Reviews' },
-              { href: '/scan', label: 'Scan QR' },
               { href: '/settings', label: 'Settings' },
             ].map((item) => (
               <Link
