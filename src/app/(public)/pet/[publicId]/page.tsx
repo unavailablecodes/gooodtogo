@@ -15,7 +15,8 @@ import { NeighborVerificationList } from '@/components/verify/NeighborVerificati
 import { calculatePetOverallScore, reviewsToScoringFormat } from '@/lib/utils/scoring';
 import { formatAge, getSpeciesEmoji, getVaccinationColor } from '@/lib/utils/format';
 import { SPECIES_OPTIONS, SIZE_OPTIONS, GENDER_OPTIONS, VACCINATION_OPTIONS } from '@/lib/constants/categories';
-import { ArrowLeft, MapPin, Calendar, Check, Mail, Phone, ExternalLink, Users } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Check, Mail, Phone, ExternalLink, Users, Share2, Download, Copy, Check as CheckIcon } from 'lucide-react';
+import { QRCode } from '@/components/ui/QRCode';
 import type { Pet, Review, NeighborVerification } from '@/types/database';
 import type { User } from '@supabase/supabase-js';
 
@@ -30,6 +31,7 @@ export default function PublicPetPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -284,15 +286,41 @@ export default function PublicPetPage() {
             </Card>
           )}
 
-          {/* QR Code Link */}
-          <div className="text-center">
-            <p className="text-sm text-gray-500 mb-2">View this profile on Pet Profile Score</p>
-            <Link href={`/pet/${pet.public_id}`}>
-              <Button variant="ghost" size="sm" rightIcon={<ExternalLink className="w-4 h-4" />}>
-                {window.location.origin}/pet/{pet.public_id}
-              </Button>
-            </Link>
-          </div>
+          {/* QR Code & Share */}
+          <Card>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Scan to view {pet.name}'s profile</h3>
+              <div className="flex justify-center mb-4">
+                <QRCode publicId={pet.public_id} petName={pet.name} size={160} />
+              </div>
+              <p className="text-sm text-gray-500 mb-4">Share this profile</p>
+              <div className="flex justify-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${typeof window !== 'undefined' ? window.location.origin : ''}/pet/${pet.public_id}`);
+                    setLinkCopied(true);
+                    setTimeout(() => setLinkCopied(false), 2000);
+                  }}
+                  leftIcon={linkCopied ? <CheckIcon className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                >
+                  {linkCopied ? 'Copied!' : 'Copy Link'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/pet/${pet.public_id}`;
+                    window.open(`https://wa.me/?text=Check%20out%20${pet.name}'s%20Pet%20Profile%20Score!%20${encodeURIComponent(shareUrl)}`, '_blank');
+                  }}
+                  leftIcon={<Share2 className="w-4 h-4" />}
+                >
+                  WhatsApp
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
