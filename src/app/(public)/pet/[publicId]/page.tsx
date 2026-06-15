@@ -111,7 +111,7 @@ export default function PublicPetPage() {
   }, [publicId]);
 
   // Check if current user is the pet owner
-  const isOwner = currentUser && pet && currentUser.id === pet.owner_id;
+  const isOwner = !!(currentUser && pet && currentUser.id === pet.owner_id);
 
   if (loading) {
     return (

@@ -235,23 +235,6 @@ export interface BusinessReview {
   reviewer?: Profile;
 }
 
-export interface BusinessCheckin {
-  id: string;
-  pet_id: string;
-  business_id: string | null;
-  business_name: string | null;
-  visit_date: string;
-  overall_rating: number | null;
-  was_aggressive: boolean;
-  was_noisy: boolean;
-  was_friendly: boolean;
-  cleaned_up_after: boolean;
-  would_allow_again: boolean;
-  notes: string | null;
-  verified: boolean;
-  created_at: string;
-}
-
 export interface UserCredibility {
   user_id: string;
   total_reviews: number;

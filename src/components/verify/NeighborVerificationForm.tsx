@@ -27,7 +27,7 @@ export function NeighborVerificationForm({ petId, petName, onSuccess }: Neighbor
   const router = useRouter();
   const supabase = createClient();
 
-  const [step, setStep] = useState<'info' | 'verify'>('info');
+  const [step, setStep] = useState<'info' | 'verify' | 'success'>('info');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [interactionType, setInteractionType] = useState<NeighborVerification['interaction_type'] | null>(null);
