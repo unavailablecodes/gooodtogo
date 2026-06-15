@@ -12,12 +12,14 @@ import { ScoreDisplay, ScoreBreakdown } from '@/components/ui/ScoreDisplay';
 import { ReviewCard } from '@/components/review/ReviewCard';
 import { NeighborVerificationForm } from '@/components/verify/NeighborVerificationForm';
 import { NeighborVerificationList } from '@/components/verify/NeighborVerificationList';
+import { BusinessCheckinForm } from '@/components/business/BusinessCheckinForm';
+import { BusinessCheckinList } from '@/components/business/BusinessCheckinList';
 import { calculatePetOverallScore, reviewsToScoringFormat } from '@/lib/utils/scoring';
 import { formatAge, getSpeciesEmoji, getVaccinationColor } from '@/lib/utils/format';
 import { SPECIES_OPTIONS, SIZE_OPTIONS, GENDER_OPTIONS, VACCINATION_OPTIONS } from '@/lib/constants/categories';
 import { ArrowLeft, MapPin, Calendar, Check, Mail, Phone, ExternalLink, Users, Share2, Download, Copy, Check as CheckIcon } from 'lucide-react';
 import { QRCode } from '@/components/ui/QRCode';
-import type { Pet, Review, NeighborVerification } from '@/types/database';
+import type { Pet, Review, NeighborVerification, BusinessCheckin } from '@/types/database';
 import type { User } from '@supabase/supabase-js';
 
 export default function PublicPetPage() {
@@ -28,6 +30,7 @@ export default function PublicPetPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [verifications, setVerifications] = useState<NeighborVerification[]>([]);
+  const [checkins, setCheckins] = useState<BusinessCheckin[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -90,6 +93,15 @@ export default function PublicPetPage() {
         .order('created_at', { ascending: false });
 
       setVerifications(verificationsData || []);
+
+      // Fetch business check-ins
+      const { data: checkinsData } = await supabase
+        .from('business_checkins')
+        .select('*')
+        .eq('pet_id', petData.id)
+        .order('visit_date', { ascending: false });
+
+      setCheckins(checkinsData || []);
       setLoading(false);
     };
 
@@ -251,6 +263,17 @@ export default function PublicPetPage() {
             <NeighborVerificationForm petId={pet.id} petName={pet.name} />
             {verifications.length > 0 && (
               <NeighborVerificationList verifications={verifications} showDate={true} isOwner={isOwner} />
+            )}
+          </div>
+
+          {/* Business Check-in */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              🏪 Business Check-ins
+            </h3>
+            <BusinessCheckinForm petId={pet.id} petName={pet.name} />
+            {checkins.length > 0 && (
+              <BusinessCheckinList checkins={checkins} showDate={true} />
             )}
           </div>
 
