@@ -66,7 +66,7 @@ export function calculateMultiSourceScore(data: {
     assessments: 0.15,  // 15% - Behavioral assessments
   };
 
-  let sourceScores: { source: string; score: number; count: number; weight: number }[] = [];
+  const sourceScores: { source: string; score: number; count: number; weight: number }[] = [];
 
   // 1. Reviews Score (40%)
   if (reviews.length > 0) {
