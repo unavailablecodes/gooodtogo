@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { VISIBILITY_OPTIONS } from '@/lib/constants/categories';
-import { Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { Save, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function PrivacySettingsPage() {
+  const router = useRouter();
   const { profile, updateProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -39,6 +41,15 @@ export default function PrivacySettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-[14px] text-[#86868b] hover:text-[#1d1d1f] mb-6 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Settings
+      </button>
+
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Privacy Settings</h1>
         <p className="text-gray-600">Control who can see your profile and pet information</p>

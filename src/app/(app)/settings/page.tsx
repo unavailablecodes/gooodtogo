@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Avatar } from '@/components/ui/Avatar';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { User, Shield, Bell, Trash2, LogOut, Check } from 'lucide-react';
+import { User, Shield, Bell, Trash2, LogOut, Check, ArrowLeft } from 'lucide-react';
 
 export default function SettingsPage() {
   const router = useRouter();
