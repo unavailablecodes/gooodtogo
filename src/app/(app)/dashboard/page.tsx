@@ -8,12 +8,20 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardTitle, CardDescription } from '@/components/ui/Card';
 import { PetCard } from '@/components/pet/PetCard';
 import { Avatar } from '@/components/ui/Avatar';
-import { Plus, PawPrint, Star, Building2, QrCode, ArrowRight } from 'lucide-react';
-import type { Pet } from '@/types/database';
+import { ScoreDisplay } from '@/components/ui/ScoreDisplay';
+import { Plus, PawPrint, Star, Building2, QrCode, ArrowRight, Users, Store, TrendingUp, ExternalLink } from 'lucide-react';
+import type { Pet, NeighborVerification, BusinessCheckin, Review } from '@/types/database';
+
+interface PetStats {
+  verifications: number;
+  checkins: number;
+  reviews: number;
+}
 
 export default function DashboardPage() {
   const { user, profile, isBusiness } = useAuth();
   const [pets, setPets] = useState<Pet[]>([]);
+  const [petStats, setPetStats] = useState<Record<string, PetStats>>({});
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -33,6 +41,25 @@ export default function DashboardPage() {
         .order('created_at', { ascending: false });
 
       setPets(data || []);
+
+      // Fetch stats for each pet
+      if (data && data.length > 0) {
+        const stats: Record<string, PetStats> = {};
+        for (const pet of data) {
+          const [verificationsRes, checkinsRes, reviewsRes] = await Promise.all([
+            supabase.from('neighbor_verifications').select('id', { count: 'exact' }).eq('pet_id', pet.id),
+            supabase.from('business_checkins').select('id', { count: 'exact' }).eq('pet_id', pet.id),
+            supabase.from('reviews').select('id', { count: 'exact' }).eq('pet_id', pet.id).eq('is_approved', true),
+          ]);
+          stats[pet.id] = {
+            verifications: verificationsRes.count || 0,
+            checkins: checkinsRes.count || 0,
+            reviews: reviewsRes.count || 0,
+          };
+        }
+        setPetStats(stats);
+      }
+
       setLoading(false);
     };
 
@@ -133,10 +160,59 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : pets.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} />
-            ))}
+          <div className="space-y-6">
+            {pets.map((pet) => {
+              const stats = petStats[pet.id] || { verifications: 0, checkins: 0, reviews: 0 };
+              return (
+                <Link key={pet.id} href={`/pets/${pet.id}`}>
+                  <Card hover className="p-6">
+                    <div className="flex items-start gap-4">
+                      {/* Pet Photo */}
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                        {pet.pet_photos && pet.pet_photos[0] ? (
+                          <img src={pet.pet_photos[0].url} alt={pet.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-3xl">🐾</div>
+                        )}
+                      </div>
+
+                      {/* Pet Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">{pet.name}</h3>
+                            <p className="text-sm text-gray-500">{pet.breed || pet.species}</p>
+                          </div>
+                          <ScoreDisplay score={pet.overall_score} size="sm" />
+                        </div>
+
+                        {/* Stats */}
+                        <div className="flex gap-4 mt-3">
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Users className="w-3 h-3" />
+                            <span>{stats.verifications} neighbor{stats.verifications !== 1 ? 's' : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Store className="w-3 h-3" />
+                            <span>{stats.checkins} check-in{stats.checkins !== 1 ? 's' : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Star className="w-3 h-3" />
+                            <span>{stats.reviews} review{stats.reviews !== 1 ? 's' : ''}</span>
+                          </div>
+                        </div>
+
+                        {/* View Profile Link */}
+                        <div className="mt-3 flex items-center gap-2 text-sm text-blue-600">
+                          <ExternalLink className="w-4 h-4" />
+                          <span>View public profile</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <Card className="text-center py-12">
@@ -197,38 +273,38 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Recent Activity */}
+      {/* Tips Section */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Getting Started</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Tips to Boost Your Pet's Score</h2>
         </div>
         <Card>
           <div className="space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold text-blue-600">
-                1
+              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <QrCode className="w-4 h-4 text-purple-600" />
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">Create a pet profile</h4>
-                <p className="text-sm text-gray-600">Add your pet's details, photos, and vaccination status.</p>
+                <h4 className="font-medium text-gray-900">Share your QR code widely</h4>
+                <p className="text-sm text-gray-600">The more people who can scan, the more verifications you'll receive.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold text-blue-600">
-                2
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Users className="w-4 h-4 text-green-600" />
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">Share your QR code</h4>
-                <p className="text-sm text-gray-600">Let businesses and reviewers scan your pet's unique QR code.</p>
+                <h4 className="font-medium text-gray-900">Ask neighbors to verify</h4>
+                <p className="text-sm text-gray-600">Neighbors can quickly confirm your pet's good behavior in just 30 seconds.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold text-blue-600">
-                3
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Star className="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">Collect reviews</h4>
-                <p className="text-sm text-gray-600">Build your pet's social score with real reviews from the community.</p>
+                <h4 className="font-medium text-gray-900">Encourage detailed reviews</h4>
+                <p className="text-sm text-gray-600">Full reviews carry more weight than quick verifications.</p>
               </div>
             </div>
           </div>
