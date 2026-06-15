@@ -320,7 +320,7 @@ export function NeighborVerificationForm({ petId, petName, onSuccess }: Neighbor
           )}
 
           {/* Notes (optional) */}
-          {isComplete && (
+          {interactionType && friendly !== null && quiet !== null && wellBehaved !== null && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Notes (optional)
