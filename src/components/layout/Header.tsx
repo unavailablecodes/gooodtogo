@@ -74,47 +74,50 @@ export function Header() {
         {/* User Actions */}
         <div className="flex items-center gap-2">
           {user ? (
-            <div className="relative" ref={menuRef}>
+            <>
               {/* Notification Bell */}
               <NotificationBell />
 
-              {/* User Name + Avatar Button */}
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 transition-all"
-              >
-                <span className="text-[13px] text-[#1d1d1f] font-medium">
-                  {profile?.full_name || 'User'}
-                </span>
-                <Avatar src={profile?.avatar_url} name={profile?.full_name} size="sm" />
-                <ChevronDown className={`w-4 h-4 text-[#86868b] transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
+              {/* User Menu */}
+              <div className="relative" ref={menuRef}>
+                {/* User Name + Avatar Button */}
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 transition-all"
+                >
+                  <span className="text-[13px] text-[#1d1d1f] font-medium">
+                    {profile?.full_name || 'User'}
+                  </span>
+                  <Avatar src={profile?.avatar_url} name={profile?.full_name} size="sm" />
+                  <ChevronDown className={`w-4 h-4 text-[#86868b] transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-              {/* Dropdown Menu */}
-              {userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl border border-black/5 shadow-lg py-2 animate-fade-in">
-                  <div className="px-4 py-2 border-b border-black/5">
-                    <p className="text-[13px] font-medium text-[#1d1d1f]">{profile?.full_name || 'User'}</p>
-                    <p className="text-[12px] text-[#86868b]">{profile?.email}</p>
+                {/* Dropdown Menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl border border-black/5 shadow-lg py-2 animate-fade-in">
+                    <div className="px-4 py-2 border-b border-black/5">
+                      <p className="text-[13px] font-medium text-[#1d1d1f]">{profile?.full_name || 'User'}</p>
+                      <p className="text-[12px] text-[#86868b]">{profile?.email}</p>
+                    </div>
+                    <Link
+                      href="/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-[#1d1d1f] hover:bg-black/5 transition-all"
+                    >
+                      <Settings className="w-4 h-4 text-[#86868b]" />
+                      Settings
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-[13px] text-[#ff3b30] hover:bg-red-50 transition-all"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
                   </div>
-                  <Link
-                    href="/settings"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-[#1d1d1f] hover:bg-black/5 transition-all"
-                  >
-                    <Settings className="w-4 h-4 text-[#86868b]" />
-                    Settings
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-3 w-full px-4 py-2.5 text-[13px] text-[#ff3b30] hover:bg-red-50 transition-all"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           ) : (
             <>
               <Link href="/login">
