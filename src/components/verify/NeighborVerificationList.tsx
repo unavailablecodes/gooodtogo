@@ -2,15 +2,16 @@
 
 import { formatDistanceToNow } from '@/lib/utils/format';
 import { Avatar } from '@/components/ui/Avatar';
-import { Check, Users, Calendar } from 'lucide-react';
+import { Check, Users, Calendar, Phone } from 'lucide-react';
 import type { NeighborVerification } from '@/types/database';
 
 interface NeighborVerificationListProps {
   verifications: NeighborVerification[];
   showDate?: boolean;
+  showPhone?: boolean;
 }
 
-export function NeighborVerificationList({ verifications, showDate = true }: NeighborVerificationListProps) {
+export function NeighborVerificationList({ verifications, showDate = true, showPhone = false }: NeighborVerificationListProps) {
   if (verifications.length === 0) {
     return (
       <div className="text-center py-6">
@@ -50,6 +51,12 @@ export function NeighborVerificationList({ verifications, showDate = true }: Nei
               <p className="text-xs text-gray-500 capitalize">
                 {verification.interaction_type.replace(/_/g, ' ')} • {verification.interaction_count}+ times
               </p>
+              {showPhone && verification.verifier_phone && (
+                <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
+                  <Phone className="w-3 h-3" />
+                  {verification.verifier_phone}
+                </div>
+              )}
               {showDate && (
                 <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
                   <Calendar className="w-3 h-3" />

@@ -85,13 +85,15 @@ export interface BusinessCheckin {
 export interface NeighborVerification {
   id: string;
   pet_id: string;
-  verifier_id: string;
+  verifier_id: string | null;
   verifier_name: string | null;
+  verifier_phone: string | null;
   interaction_type: 'walked_together' | 'met_at_park' | 'visited_home' | 'saw_daily' | 'other';
   interaction_count: number;
   friendly_rating: number | null;
   quiet_rating: number | null;
   well_behaved: boolean;
+  notes: string | null;
   created_at: string;
 }
 

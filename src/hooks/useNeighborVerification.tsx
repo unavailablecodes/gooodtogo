@@ -6,11 +6,14 @@ import type { NeighborVerification } from '@/types/database';
 
 interface CreateVerificationForm {
   pet_id: string;
+  verifier_name: string;
+  verifier_phone: string;
   interaction_type: NeighborVerification['interaction_type'];
   interaction_count: number;
   friendly_rating?: number;
   quiet_rating?: number;
   well_behaved: boolean;
+  notes?: string;
 }
 
 interface UseNeighborVerificationReturn {
@@ -19,6 +22,7 @@ interface UseNeighborVerificationReturn {
   error: string | null;
   fetchVerifications: (petId: string) => Promise<void>;
   createVerification: (data: CreateVerificationForm) => Promise<{ verification?: NeighborVerification; error?: string }>;
+  checkAlreadyVerified: (petId: string, phone: string) => Promise<boolean>;
 }
 
 export function useNeighborVerification(): UseNeighborVerificationReturn {
@@ -47,37 +51,45 @@ export function useNeighborVerification(): UseNeighborVerificationReturn {
     }
   }, []);
 
+  const checkAlreadyVerified = useCallback(async (petId: string, phone: string): Promise<boolean> => {
+    const { data } = await supabase
+      .from('neighbor_verifications')
+      .select('id')
+      .eq('pet_id', petId)
+      .eq('verifier_phone', phone)
+      .single();
+
+    return !!data;
+  }, []);
+
   const createVerification = useCallback(async (data: CreateVerificationForm): Promise<{ verification?: NeighborVerification; error?: string }> => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return { error: 'Please login to verify' };
-
-      // Get user profile for name
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .single();
-
       const { data: verification, error: createError } = await supabase
         .from('neighbor_verifications')
         .insert({
           pet_id: data.pet_id,
-          verifier_id: user.id,
-          verifier_name: profile?.full_name || null,
+          verifier_id: null, // No login required
+          verifier_name: data.verifier_name,
+          verifier_phone: data.verifier_phone,
           interaction_type: data.interaction_type,
           interaction_count: data.interaction_count,
           friendly_rating: data.friendly_rating || null,
           quiet_rating: data.quiet_rating || null,
           well_behaved: data.well_behaved,
+          notes: data.notes || null,
         })
         .select()
         .single();
 
-      if (createError) throw createError;
+      if (createError) {
+        if (createError.code === '23505') {
+          return { error: 'This phone number has already verified this pet' };
+        }
+        throw createError;
+      }
 
       // Add to local state
       setVerifications(prev => [verification, ...prev]);
@@ -98,5 +110,6 @@ export function useNeighborVerification(): UseNeighborVerificationReturn {
     error,
     fetchVerifications,
     createVerification,
+    checkAlreadyVerified,
   };
 }
