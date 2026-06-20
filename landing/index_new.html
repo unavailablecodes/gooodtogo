@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Profile Score — Where Good Pets Get Recognized</title>
+  <meta name="description" content="The trusted behavior verification system for pets. Like a credit score — but for your furry friend's behavior.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #08080c;
+      color: #fafafa;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(196, 151, 255, 0.3); color: #fff; }
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      position: relative;
+    }
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg::before {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%);
+      animation: bgMove 30s ease-in-out infinite;
+    }
+    @keyframes bgMove {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-2%, 2%); }
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: orbFloat 20s ease-in-out infinite;
+      opacity: 0.5;
+    }
+    .orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(139, 92, 246, 0.3), transparent 70%); top: -100px; right: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(236, 72, 153, 0.25), transparent 70%); bottom: -50px; left: -50px; animation-delay: -7s; }
+    .orb-3 { width: 200px; height: 200px; background: radial-gradient(circle, rgba(251, 191, 36, 0.15), transparent 70%); top: 50%; left: 10%; animation-delay: -14s; }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -30px); }
+    }
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+    main {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 900px;
+      width: 100%;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards;
+    }
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #c4a7e7 0%, #f4acb9 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 20px 40px rgba(196, 151, 255, 0.3);
+    }
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      padding: 0.5rem 1.25rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.1s forwards;
+      backdrop-filter: blur(10px);
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #34d399;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 12px #34d399; }
+      50% { opacity: 0.6; box-shadow: 0 0 20px #34d399; }
+    }
+    .headline-wrapper {
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .rotating-line {
+      display: block;
+    }
+    .rotating-line span {
+      display: none;
+    }
+    .rotating-line span.active {
+      display: block;
+      animation: fadeWord 0.6s ease forwards;
+    }
+    @keyframes fadeWord {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #c4a7e7 0%, #f4acb9 40%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subheadline {
+      font-size: 1.125rem;
+      line-height: 1.75;
+      color: rgba(255, 255, 255, 0.45);
+      font-weight: 300;
+      margin-bottom: 3.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+    .form-wrapper {
+      width: 100%;
+      margin-bottom: 5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+    .form {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .input {
+      flex: 1;
+      padding: 1.125rem 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      font-size: 0.9375rem;
+      color: rgba(255, 255, 255, 0.9);
+      outline: none;
+      transition: all 0.4s ease;
+      font-family: inherit;
+    }
+    .input::placeholder { color: rgba(255, 255, 255, 0.25); }
+    .input:focus {
+      border-color: rgba(196, 151, 255, 0.5);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 0 4px rgba(196, 151, 255, 0.1);
+    }
+    .btn {
+      padding: 1.125rem 2rem;
+      background: linear-gradient(135deg, #c4a7e7 0%, #f4acb9 100%);
+      border: none;
+      border-radius: 14px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #0a0a0f;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(196, 151, 255, 0.35);
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-top-color: #0a0a0f;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .form-note { font-size: 0.75rem; color: rgba(255, 255, 255, 0.25); margin-top: 1rem; }
+    .success { padding: 3rem; text-align: center; display: none; }
+    .success.show { display: block; animation: fadeUp 0.6s ease; }
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 20px 50px rgba(52, 211, 153, 0.4);
+    }
+    .success h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .success p { color: rgba(255, 255, 255, 0.5); }
+    .divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      margin: 0 auto 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 700px;
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+    .feature {
+      padding: 2rem 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      text-align: center;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+    .feature:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-4px);
+    }
+    .feature-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+    .feature h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .feature p { font-size: 0.8125rem; color: rgba(255, 255, 255, 0.35); line-height: 1.5; }
+    .testimonial {
+      max-width: 500px;
+      padding: 2rem 2.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 24px;
+      margin-bottom: 4rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+    .testimonial p {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-author { display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #c4a7e7 0%, #f4acb9 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .author-name { font-size: 0.875rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); }
+    .author-role { font-size: 0.75rem; color: rgba(255, 255, 255, 0.35); }
+    footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+    footer p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.2); }
+    @media (max-width: 768px) {
+      .form { flex-direction: column; }
+      .btn { width: 100%; }
+      .features { grid-template-columns: 1fr; gap: 1rem; }
+      .testimonial { padding: 1.5rem; }
+      .headline-wrapper { min-height: 260px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+    <div class="grain"></div>
+    <main>
+      <div class="logo">
+        <div class="logo-icon">🐾</div>
+        <span class="logo-text">Pet Profile Score</span>
+      </div>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Invite Only — Limited Access
+      </div>
+      <div class="headline-wrapper">
+        <h1>
+          <span class="rotating-line">
+            <span class="active">Sound familiar?<br><span class="gradient-text">'Dogs and Indians not allowed'</span></span>
+            <span>Good dogs denied housing<br><span class="gradient-text">because of breed</span></span>
+            <span>Because one dog bit,<br><span class="gradient-text">all dogs banned</span></span>
+            <span>Indian dogs deserve<br><span class="gradient-text">recognition too</span></span>
+            <span>The score that proves<br><span class="gradient-text">your pet is good</span></span>
+            <span>Where behavior matters,<br><span class="gradient-text">not breed</span></span>
+            <span>Stop punishing<br><span class="gradient-text">well-trained pets</span></span>
+            <span>Finally, a way to prove<br><span class="gradient-text">your dog is good</span></span>
+          </span>
+        </h1>
+      </div>
+      <p class="subheadline">
+        The behavior verification system for pets.<br>
+        Built for responsible pet parents who know their furry friend is amazing.
+      </p>
+      <div class="form-wrapper" id="formWrapper">
+        <form id="waitlistForm" class="form">
+          <input type="email" class="input" placeholder="Enter your email" id="emailInput" required>
+          <button type="submit" class="btn" id="submitBtn">Request Access</button>
+        </form>
+        <p class="form-note">Exclusive early access. No spam, ever.</p>
+      </div>
+      <div class="success" id="successMessage">
+        <div class="success-icon">✓</div>
+        <h2>You're on the list</h2>
+        <p>We'll reach out when your access is ready.</p>
+      </div>
+      <div class="divider"></div>
+      <div class="features">
+        <div class="feature">
+          <span class="feature-icon">📱</span>
+          <h3>QR Code Profile</h3>
+          <p>Share your pet's verified profile with one scan</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">⭐</span>
+          <h3>Trusted Score</h3>
+          <p>Multi-source verification from neighbors & businesses</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">🏨</span>
+          <h3>Business Approved</h3>
+          <p>Hotels, cafes & airlines trust the score</p>
+        </div>
+      </div>
+      <div class="testimonial">
+        <p>"Finally, a way to prove my rescue dog is the best behaved pup at the park."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">S</div>
+          <div>
+            <div class="author-name">Sarah K.</div>
+            <div class="author-role">Dog Parent, Mumbai</div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>© 2026 Pet Profile Score. All rights reserved.</p>
+    </footer>
+  </div>
+  <script>
+    const lines = document.querySelectorAll('.rotating-line span');
+    let currentLine = 0;
+    function rotateLine() {
+      lines[currentLine].classList.remove('active');
+      currentLine = (currentLine + 1) % lines.length;
+      lines[currentLine].classList.add('active');
+    }
+    setInterval(rotateLine, 3000);
+    const form = document.getElementById('waitlistForm');
+    const formWrapper = document.getElementById('formWrapper');
+    const successMessage = document.getElementById('successMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    const emailInput = document.getElementById('emailInput');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span>';
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      formWrapper.style.display = 'none';
+      successMessage.classList.add('show');
+      console.log('Waitlist signup:', emailInput.value);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pet Profile Score</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, -apple-system, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .page {
+      max-width: 680px;
+      width: 100%;
+      padding: 48px 24px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 32px;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #34d399;
+      border-radius: 50%;
+    }
+    .headline {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: clamp(14px, 2.5vw, 28px);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: 0;
+      margin-bottom: 20px;
+    }
+    .hl {
+      background: #fff;
+      color: #000;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+      display: inline-block;
+      font-size: inherit;
+    }
+    .rotating-line span {
+      display: none;
+    }
+    .rotating-line span.active {
+      display: block;
+    }
+    .subheadline {
+      font-size: 15px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+    .form-section {
+      max-width: 400px;
+      margin: 0 auto 32px;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .input {
+      flex: 1;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      font-size: 15px;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .input::placeholder { color: rgba(255,255,255,0.5); }
+    .input:focus {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.12);
+    }
+    .input-full {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      font-size: 15px;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+    .input-full::placeholder { color: rgba(255,255,255,0.5); }
+    .input-full:focus {
+      border-color: rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.12);
+    }
+    .btn {
+      width: 100%;
+      padding: 16px 32px;
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .note {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 12px;
+    }
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+      margin: 0 auto 48px;
+    }
+    .testimonial {
+      padding: 24px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+    }
+    .testimonial p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      font-style: italic;
+    }
+    .success {
+      display: none;
+      padding: 48px 24px;
+    }
+    .success.show { display: block; }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: #34d399;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #000;
+      margin: 0 auto 24px;
+    }
+    .success h2 {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .success p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+    }
+    .feedback-section {
+      margin-top: 32px;
+      text-align: left;
+      padding: 24px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+    }
+    .feedback-section h3 {
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 16px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .btn-choice {
+      flex: 1;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-choice:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .btn-choice.active {
+      background: rgba(52,211,153,0.15);
+      border-color: #34d399;
+      color: #34d399;
+    }
+    .problem-box { display: none; margin-bottom: 16px; }
+    .problem-box.show { display: block; }
+    .final-message { display: none; margin-top: 32px; }
+    .final-message.show { display: block; }
+    .final-message p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    @media (max-width: 480px) {
+      .input-row { flex-direction: column; }
+      .btn-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Invite Only
+    </div>
+
+    <h1 class="headline">
+      <span class="rotating-line">
+        <span class="active">Sound familiar? '<span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">Dogs not allowed</span>'</span>
+        <span><span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">Good dogs</span> denied due to breed</span>
+        <span>One dog bit, <span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">all dogs banned</span></span>
+        <span><span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">Indian dogs</span> deserve recognition</span>
+        <span>Society says walk outside. <span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">Dark lanes. Strays. No safe zone.</span></span>
+        <span><span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">Behavior</span> should matter, not breed</span>
+        <span>Stop punishing <span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">good pets</span></span>
+        <span><span style="background:#fff;color:#000;font-weight:600;padding:1px 5px;border-radius:4px;">Prove your dog</span> is good</span>
+      </span>
+    </h1>
+
+    <p class="subheadline">A verification system for pet behavior.</p>
+
+    <div class="form-section" id="formSection">
+      <div class="input-row">
+        <input type="email" class="input" placeholder="Email" id="emailInput" required>
+        <input type="text" class="input" placeholder="Name (optional)" id="nameInput">
+      </div>
+      <input type="tel" class="input-full" placeholder="Phone (optional)" id="phoneInput">
+      <button class="btn" id="submitBtn" onclick="submitForm()">Request Access</button>
+      <p class="note">We'll reach out when your access is ready.</p>
+    </div>
+
+    <div class="success" id="successMessage">
+      <div class="success-icon">✓</div>
+      <h2>You're on the list.</h2>
+      <p>We'll reach out when your access is ready.</p>
+
+      <div class="feedback-section">
+        <h3>Have you faced any pet-related problems?</h3>
+        <div class="btn-row">
+          <button class="btn-choice" id="yesBtn" onclick="selectProblem('yes')">Yes</button>
+          <button class="btn-choice" id="noBtn" onclick="selectProblem('no')">No</button>
+        </div>
+        <div class="problem-box" id="problemBox">
+          <input type="text" class="input-full" placeholder="What problem did you face?" id="problemInput">
+        </div>
+        <input type="text" class="input-full" placeholder="Features you'd love to see? (optional)" id="suggestionInput">
+        <button class="btn" onclick="submitFeedback()">Submit</button>
+      </div>
+
+      <div class="final-message" id="finalMessage">
+        <p>Thank you for your time and interest.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="testimonial">
+      <p>Real testimonials coming soon.</p>
+    </div>
+  </div>
+
+  <script>
+    // Rotating headlines
+    const lines = document.querySelectorAll('.rotating-line span');
+    let currentLine = 0;
+    setInterval(() => {
+      lines[currentLine].classList.remove('active');
+      currentLine = (currentLine + 1) % lines.length;
+      lines[currentLine].classList.add('active');
+    }, 3000);
+
+    // Form submission
+    function submitForm() {
+      const email = document.getElementById('emailInput').value;
+      if (!email) return;
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('successMessage').classList.add('show');
+      console.log('Email:', email);
+    }
+
+    // Problem selection
+    function selectProblem(answer) {
+      const yesBtn = document.getElementById('yesBtn');
+      const noBtn = document.getElementById('noBtn');
+      const problemBox = document.getElementById('problemBox');
+      if (answer === 'yes') {
+        yesBtn.classList.add('active');
+        noBtn.classList.remove('active');
+        problemBox.classList.add('show');
+      } else {
+        noBtn.classList.add('active');
+        yesBtn.classList.remove('active');
+        problemBox.classList.remove('show');
+      }
+    }
+
+    // Feedback submission
+    function submitFeedback() {
+      const problem = document.getElementById('problemInput').value;
+      const suggestion = document.getElementById('suggestionInput').value;
+      document.querySelector('.feedback-section').style.display = 'none';
+      document.getElementById('finalMessage').classList.add('show');
+      console.log('Problem:', problem, 'Suggestion:', suggestion);
+    }
+  </script>
+</body>
+</html>
